@@ -23,13 +23,16 @@ public class ParcelServiceImpl implements ParcelService {
     private final ParcelMapper parcelMapper;
     private final TariffGridDao tariffGridDao;
     private final ParcelDao parcelDao;
+    private final ShipmentService shipmentService;
 
 
     @Autowired
-    ParcelServiceImpl(final ParcelMapper parcelMapper, final TariffGridDao tariffGridDao, final ParcelDao parcelDao) {
+    ParcelServiceImpl(final ParcelMapper parcelMapper, final TariffGridDao tariffGridDao, final ParcelDao parcelDao,
+                      final ShipmentService shipmentService) {
         this.parcelMapper = parcelMapper;
         this.tariffGridDao = tariffGridDao;
         this.parcelDao = parcelDao;
+        this.shipmentService = shipmentService;
     }
 
     @Override
@@ -103,7 +106,7 @@ public class ParcelServiceImpl implements ParcelService {
         final Parcel parcel = parcelMapper.toEntity(parcelDto);
         log.info("Calculating price for parcel {}", parcel);
 
-        final Shipment shipment = parcel.getShipment();
+        final Shipment shipment = shipmentService.getEntityById(parcel.getShipment().getId());
         final Address senderAddress = shipment.getSender().getAddress();
         final Address recipientAddress = shipment.getRecipient().getAddress();
         W2wVariation w2wVariation = W2wVariation.COUNTRY;

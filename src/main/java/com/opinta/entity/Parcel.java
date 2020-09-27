@@ -15,9 +15,9 @@ public class Parcel {
     @GeneratedValue
     private long id;
 
-    @ManyToOne
+/*    @ManyToOne
     @JoinColumn(name = "shipment_id")
-    private Shipment shipment;
+    private Shipment shipment;*/
 
     private float weight;
     private float length;
@@ -26,7 +26,7 @@ public class Parcel {
     private BigDecimal declaredPrice;
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = "parcels")
+    @ManyToMany(mappedBy = "parcels", fetch = FetchType.LAZY)
     private List<ParcelItem> parcelItems;
 
 

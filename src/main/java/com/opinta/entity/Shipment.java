@@ -3,6 +3,7 @@ package com.opinta.entity;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.*;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@Table(name = "SHIPMENT")
 public class Shipment {
     @Id
     @GeneratedValue
@@ -26,14 +28,11 @@ public class Shipment {
     private BarcodeInnerNumber barcode;
     @Enumerated(EnumType.STRING)
     private DeliveryType deliveryType;
-    private float weight;
-    private BigDecimal declaredPrice;
     private BigDecimal price;
     private BigDecimal postPay;
     private String description;
 
-    @OneToMany
-    @JoinColumn(name = "parcel_id")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "shipment")
     private List<Parcel> parcels;
 
     @Transient
@@ -42,6 +41,7 @@ public class Shipment {
     public Shipment() {
         this.parcels = new ArrayList<>();
         this.parcelsQuantity = parcels.size();
+        this.price = calculatePrice();
     }
 
     public Shipment(Client sender, Client recipient, DeliveryType deliveryType, BigDecimal price, BigDecimal postPay) {
@@ -52,6 +52,7 @@ public class Shipment {
         this.postPay = postPay;
         this.parcels = new ArrayList<>();
         this.parcelsQuantity = parcels.size();
+        this.price = calculatePrice();
     }
 
     public BigDecimal getPrice() {
@@ -61,36 +62,11 @@ public class Shipment {
         return this.price;
     }
 
-    public BigDecimal getDeclaredPrice() {
-        if (parcelListSizeChanged()) {
-            this.declaredPrice = calculateDeclaredPrice();
-        }
-        return this.declaredPrice;
-    }
-
-    public float getWeight(){
-        if (parcelListSizeChanged()) {
-            this.weight = calculateWeight();
-        }
-        return this.weight;
-    }
-
     public BigDecimal calculatePrice() {
         return parcels.stream()
+                .filter(Objects::nonNull)
                 .map(Parcel::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    public BigDecimal calculateDeclaredPrice() {
-        return parcels.stream()
-                .map(Parcel::getDeclaredPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    public float calculateWeight() {
-        return parcels.stream()
-                .map(Parcel::getWeight)
-                .reduce(0f, Float::sum);
     }
 
     private boolean parcelListSizeChanged() {

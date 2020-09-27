@@ -2,10 +2,7 @@ package com.opinta.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,6 +20,9 @@ public class ParcelItem {
     private float weight;
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = "parcel_items")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "parcel_item",
+                joinColumns = @JoinColumn(name = "parcel_id"),
+                inverseJoinColumns = @JoinColumn(name = "item_id"))
     private List<Parcel> parcels;
 }
