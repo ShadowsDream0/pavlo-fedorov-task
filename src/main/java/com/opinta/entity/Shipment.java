@@ -10,10 +10,13 @@ import javax.persistence.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Entity
 @Data
-@Table(name = "SHIPMENT")
+@Table(name = "shipment")
 public class Shipment {
     @Id
     @GeneratedValue
@@ -32,14 +35,14 @@ public class Shipment {
     private BigDecimal postPay;
     private String description;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "shipment")
-    private List<Parcel> parcels;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "shipment", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<Parcel> parcels = new ArrayList<>();
 
     @Transient
     private int parcelsQuantity;
 
     public Shipment() {
-        this.parcels = new ArrayList<>();
         this.parcelsQuantity = parcels.size();
         this.price = calculatePrice();
     }
@@ -50,9 +53,13 @@ public class Shipment {
         this.deliveryType = deliveryType;
         this.price = price;
         this.postPay = postPay;
-        this.parcels = new ArrayList<>();
         this.parcelsQuantity = parcels.size();
         this.price = calculatePrice();
+    }
+
+    public void addParcel(@NonNull final Parcel parcel) {
+        parcel.setShipment(this);
+        this.parcels.add(parcel);
     }
 
     public BigDecimal getPrice() {
@@ -63,6 +70,7 @@ public class Shipment {
     }
 
     public BigDecimal calculatePrice() {
+        Objects.requireNonNull(parcels, "field parcels must not be null but was null");
         return parcels.stream()
                 .filter(Objects::nonNull)
                 .map(Parcel::getPrice)
@@ -70,6 +78,7 @@ public class Shipment {
     }
 
     private boolean parcelListSizeChanged() {
+        Objects.requireNonNull(parcels, "field parcels must not be null but was null");
         int size = parcels.size();
         if (parcelsQuantity != size) {
             parcelsQuantity = size;

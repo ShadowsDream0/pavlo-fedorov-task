@@ -1,10 +1,16 @@
 package com.opinta.dao;
 
 import com.opinta.entity.Parcel;
+import com.opinta.entity.Shipment;
+import lombok.NonNull;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public class ParcelDaoImpl implements ParcelDao {
@@ -22,19 +28,29 @@ public class ParcelDaoImpl implements ParcelDao {
     }
 
     @Override
-    public Parcel save(Parcel parcel) {
+    @SuppressWarnings("unchecked")
+    public List<Parcel> getAllParcelsByShipmentId(final long shipmentId){
+        Session session = sessionFactory.getCurrentSession();
+        return session.createCriteria(Parcel.class)
+                .add(Restrictions.idEq(shipmentId))
+                .setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY)
+                .list();
+    }
+
+    @Override
+    public Parcel save(@NonNull final Parcel parcel) {
         Session session = sessionFactory.getCurrentSession();
         return (Parcel) session.merge(parcel);
     }
 
     @Override
-    public void update(Parcel parcel) {
+    public void update(@NonNull final Parcel parcel) {
         Session session = sessionFactory.getCurrentSession();
         session.update(parcel);
     }
 
     @Override
-    public void delete(Parcel parcel) {
+    public void delete(@NonNull final Parcel parcel) {
         Session session = sessionFactory.getCurrentSession();
         session.delete(parcel);
     }

@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Component
 public class TestHelper {
@@ -27,6 +30,8 @@ public class TestHelper {
     private ShipmentService shipmentService;
     @Autowired
     private PostOfficeService postOfficeService;
+    @Autowired
+    private ParcelService parcelService;
 
     public PostOffice createPostOffice() {
         PostOffice postOffice = new PostOffice("Lviv post office", createAddress(), createPostcodePool());
@@ -41,11 +46,16 @@ public class TestHelper {
     public Shipment createShipment() {
         Shipment shipment = new Shipment(createClient(), createClient(),
                 DeliveryType.D2D, new BigDecimal(30), new BigDecimal(35.2));
+        shipment.setParcels(createParcels(shipment));
+
         return shipmentService.saveEntity(shipment);
     }
 
     public void deleteShipment(Shipment shipment) {
         shipmentService.delete(shipment.getId());
+        /*shipment.getParcels().stream()
+                                .filter(Objects::nonNull)
+                                .forEach(this::deleteParcel);*/
         clientService.delete(shipment.getSender().getId());
         clientService.delete(shipment.getRecipient().getId());
     }
@@ -92,5 +102,22 @@ public class TestHelper {
 
     public File getFileFromResources(String path) {
         return new File(getClass().getClassLoader().getResource(path).getFile());
+    }
+
+    private List<Parcel> createParcels(Shipment shipment) {
+        List<Parcel> parcels = new ArrayList<>();
+        Parcel parcel1 = new Parcel(0.4f, 29.0f, 3.0f, 0.5f, BigDecimal.valueOf(20.0f),
+                BigDecimal.valueOf(15.0f));
+        parcel1.setShipment(shipment);
+        Parcel parcel2 = new Parcel(14.0f, 69.0f, 4.0f, 1.0f, BigDecimal.valueOf(100.0f),
+                BigDecimal.valueOf(30.0f));
+        parcel2.setShipment(shipment);
+        parcels.add(parcel1);
+        parcels.add(parcel2);
+        return parcels;
+    }
+
+    private void deleteParcel(Parcel parcel) {
+        parcelService.delete(parcel.getId());
     }
 }

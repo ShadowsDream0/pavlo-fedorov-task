@@ -1,5 +1,6 @@
 package com.opinta.service;
 
+import com.opinta.dao.ParcelDao;
 import com.opinta.dao.TariffGridDao;
 import java.util.List;
 
@@ -8,12 +9,8 @@ import javax.transaction.Transactional;
 import com.opinta.dao.ClientDao;
 import com.opinta.dao.ShipmentDao;
 import com.opinta.dto.ShipmentDto;
+import com.opinta.entity.*;
 import com.opinta.mapper.ShipmentMapper;
-import com.opinta.entity.BarcodeInnerNumber;
-import com.opinta.entity.Client;
-import com.opinta.entity.PostcodePool;
-import com.opinta.entity.Shipment;
-import com.opinta.entity.Counterparty;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,14 +24,17 @@ public class ShipmentServiceImpl implements ShipmentService {
     private final ClientDao clientDao;
     private final ShipmentMapper shipmentMapper;
     private final BarcodeInnerNumberService barcodeInnerNumberService;
+    private final ParcelDao parcelDao;
 
     @Autowired
     public ShipmentServiceImpl(ShipmentDao shipmentDao, ClientDao clientDao, TariffGridDao tariffGridDao,
-                               ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeInnerNumberService) {
+                               ShipmentMapper shipmentMapper, BarcodeInnerNumberService barcodeInnerNumberService,
+                               ParcelDao parcelDao) {
         this.shipmentDao = shipmentDao;
         this.clientDao = clientDao;
         this.shipmentMapper = shipmentMapper;
         this.barcodeInnerNumberService = barcodeInnerNumberService;
+        this.parcelDao = parcelDao;
     }
 
     @Override
@@ -96,7 +96,6 @@ public class ShipmentServiceImpl implements ShipmentService {
 
         shipment.setSender(clientDao.getById(shipment.getSender().getId()));
         shipment.setRecipient(clientDao.getById(shipment.getRecipient().getId()));
-        shipment.setPrice(shipment.calculatePrice());
 
         return shipmentMapper.toDto(shipmentDao.save(shipment));
     }
@@ -117,7 +116,6 @@ public class ShipmentServiceImpl implements ShipmentService {
             log.error("Can't get properties from object to updatable object for shipment", e);
         }
         target.setId(id);
-        target.setPrice(target.calculatePrice());
         log.info("Updating shipment {}", target);
         shipmentDao.update(target);
         return shipmentMapper.toDto(target);

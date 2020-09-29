@@ -1,23 +1,25 @@
 package com.opinta.entity;
 
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "shipment")
 public class Parcel {
     @Id
     @GeneratedValue
     private long id;
 
-/*    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "shipment_id")
-    private Shipment shipment;*/
+    private Shipment shipment;
 
     private float weight;
     private float length;
@@ -27,12 +29,10 @@ public class Parcel {
     private BigDecimal price;
 
     @ManyToMany(mappedBy = "parcels", fetch = FetchType.LAZY)
-    private List<ParcelItem> parcelItems;
+    private Set<ParcelItem> parcelItems = new HashSet<>();
 
 
-    public Parcel() {
-        parcelItems = new ArrayList<>();
-    }
+    public Parcel() {}
 
     public Parcel(final float weight, final float length, final float width, final float height,
                   @NonNull final BigDecimal declaredPrice, @NonNull final BigDecimal price) {
@@ -42,6 +42,5 @@ public class Parcel {
         this.height = height;
         this.declaredPrice = declaredPrice;
         this.price = price;
-        parcelItems = new ArrayList<>();
     }
 }

@@ -106,7 +106,7 @@ public class ParcelServiceImpl implements ParcelService {
         final Parcel parcel = parcelMapper.toEntity(parcelDto);
         log.info("Calculating price for parcel {}", parcel);
 
-        final Shipment shipment = shipmentService.getEntityById(parcel.getShipment().getId());
+        final Shipment shipment = shipmentService.getEntityById(parcelDto.getShipmentId());
         final Address senderAddress = shipment.getSender().getAddress();
         final Address recipientAddress = shipment.getRecipient().getAddress();
         W2wVariation w2wVariation = W2wVariation.COUNTRY;
