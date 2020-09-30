@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "item")
 public class ParcelItem {
 
     @Id
@@ -21,9 +22,9 @@ public class ParcelItem {
     private float weight;
     private BigDecimal price;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "parcel_items",
-                joinColumns = @JoinColumn(name = "parcel_item_id"),
+                joinColumns = @JoinColumn(name = "item_id"),
                 inverseJoinColumns = @JoinColumn(name = "parcel_id"))
     private List<Parcel> parcels;
 

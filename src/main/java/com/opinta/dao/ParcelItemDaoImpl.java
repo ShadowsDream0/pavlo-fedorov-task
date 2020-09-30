@@ -1,5 +1,6 @@
 package com.opinta.dao;
 
+import com.opinta.entity.Parcel;
 import com.opinta.entity.ParcelItem;
 import lombok.NonNull;
 import org.hibernate.Session;
@@ -7,13 +8,30 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ParcelItemDaoImpl implements ParcelItemDao {
     private final SessionFactory sessionFactory;
+    private static final String SELECT_PARCEL_ITEMS_QUERY = "SELECT name, quantity, weight, price" +
+                                                            " FROM item" +
+                                                            " JOIN parcel_items" +
+                                                                " ON item.id = parcel_items.item_id" +
+                                                            " JOIN parcel" +
+                                                                " ON parcel.id = parcel_items.parcel_id" +
+                                                            " WHERE parcel_items.parcel_id = ";
 
     @Autowired
     public ParcelItemDaoImpl(@NonNull final SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<ParcelItem> getAllParcelItemsByParcel(Parcel parcel) {
+        final Session session = sessionFactory.getCurrentSession();
+        return session.createSQLQuery(SELECT_PARCEL_ITEMS_QUERY + parcel.getId())
+                .list();
     }
 
     @Override

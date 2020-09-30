@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ParcelDao {
 
+    List<Parcel> getAll();
+
     List<Parcel> getAllParcelsByShipment(Shipment shipment);
 
     Parcel getById(long id);

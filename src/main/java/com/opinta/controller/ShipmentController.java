@@ -1,12 +1,17 @@
 package com.opinta.controller;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import com.opinta.dto.ParcelDto;
+import com.opinta.dto.ParcelItemDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
+import com.opinta.service.ParcelItemService;
 import com.opinta.service.ParcelService;
 import com.opinta.service.ShipmentService;
+import org.mapstruct.ap.internal.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,13 +37,15 @@ public class ShipmentController {
     private ShipmentService shipmentService;
     private PDFGeneratorService pdfGeneratorService;
     private ParcelService parcelService;
+    private ParcelItemService parcelItemService;
 
     @Autowired
     public ShipmentController(ShipmentService shipmentService, PDFGeneratorService pdfGeneratorService,
-                              ParcelService parcelService) {
+                              ParcelService parcelService, ParcelItemService parcelItemService) {
         this.shipmentService = shipmentService;
         this.pdfGeneratorService = pdfGeneratorService;
         this.parcelService = parcelService;
+        this.parcelItemService = parcelItemService;
     }
 
     @GetMapping
@@ -63,6 +70,28 @@ public class ShipmentController {
             return new ResponseEntity<>(format("Shipment %d doesn't exist", shipmentId), NOT_FOUND);
         }
         return new ResponseEntity<>(parcelDtos, OK);
+    }
+
+    @GetMapping("{shipmentId}/parcels/{parcelId}/parcel-items")
+    public ResponseEntity<?> getParcels(@PathVariable("shipmentId") long shipmentId,
+                                        @PathVariable("parcelId") long parcelId) {
+        List<ParcelDto> parcelDtos = parcelService.getAllParcelsByShipmentId(shipmentId);
+
+        if (parcelDtos == null) {
+            return new ResponseEntity<>(format("Shipment %d doesn't exist", shipmentId), NOT_FOUND);
+        }
+
+        Optional<ParcelDto> parcelDto = parcelDtos.stream()
+                .filter(p -> p.getId() == parcelId)
+                .findFirst();
+
+        if (!parcelDto.isPresent()){
+            return new ResponseEntity<>(format("Parcel %d doesn't exist", parcelId), NOT_FOUND);
+        }
+
+        List<ParcelItemDto> parcelItemDtos = parcelItemService.getAllParcelItemsByParcelId(parcelDto.get().getId());
+
+        return new ResponseEntity<>(parcelItemDtos, OK);
     }
 
     @GetMapping("{id}/label-form")

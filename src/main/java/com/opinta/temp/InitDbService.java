@@ -1,5 +1,6 @@
 package com.opinta.temp;
 
+import com.opinta.dao.ParcelDao;
 import com.opinta.dto.*;
 import com.opinta.entity.*;
 import com.opinta.mapper.*;
@@ -8,6 +9,7 @@ import com.opinta.service.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -30,6 +32,7 @@ public class InitDbService {
     private ShipmentTrackingDetailService shipmentTrackingDetailService;
     private TariffGridService tariffGridService;
     private ParcelService parcelService;
+    private ParcelItemService parcelItemService;
 
     private ClientMapper clientMapper;
     private AddressMapper addressMapper;
@@ -40,6 +43,9 @@ public class InitDbService {
     private CounterpartyMapper counterpartyMapper;
     private ShipmentTrackingDetailMapper shipmentTrackingDetailMapper;
     private ParcelMapper parcelMapper;
+    private ParcelItemMapper parcelItemMapper;
+
+    private ParcelDao parcelDao;
 
     @Autowired
     public InitDbService(
@@ -47,10 +53,12 @@ public class InitDbService {
             ClientService clientService, AddressService addressService, ShipmentService shipmentService,
             CounterpartyService counterpartyService, PostOfficeService postOfficeService,
             ShipmentTrackingDetailService shipmentTrackingDetailService, TariffGridService tariffGridService,
-            ParcelService parcelService, ClientMapper clientMapper, AddressMapper addressMapper,
-            PostcodePoolMapper postcodePoolMapper, BarcodeInnerNumberMapper barcodeInnerNumberMapper,
-            ShipmentMapper shipmentMapper, PostOfficeMapper postOfficeMapper, CounterpartyMapper counterpartyMapper,
-            ShipmentTrackingDetailMapper shipmentTrackingDetailMapper, ParcelMapper parcelMapper) {
+            ParcelService parcelService, ParcelItemService parcelItemService,
+            ClientMapper clientMapper, AddressMapper addressMapper, PostcodePoolMapper postcodePoolMapper,
+            BarcodeInnerNumberMapper barcodeInnerNumberMapper, ShipmentMapper shipmentMapper,
+            PostOfficeMapper postOfficeMapper, CounterpartyMapper counterpartyMapper,
+            ShipmentTrackingDetailMapper shipmentTrackingDetailMapper, ParcelMapper parcelMapper,
+            ParcelItemMapper parcelItemMapper, ParcelDao parcelDao) {
         this.barcodeInnerNumberService = barcodeInnerNumberService;
         this.postcodePoolService = postcodePoolService;
         this.clientService = clientService;
@@ -61,6 +69,7 @@ public class InitDbService {
         this.shipmentTrackingDetailService = shipmentTrackingDetailService;
         this.tariffGridService = tariffGridService;
         this.parcelService = parcelService;
+        this.parcelItemService = parcelItemService;
         this.clientMapper = clientMapper;
         this.addressMapper = addressMapper;
         this.postcodePoolMapper = postcodePoolMapper;
@@ -70,6 +79,9 @@ public class InitDbService {
         this.counterpartyMapper = counterpartyMapper;
         this.shipmentTrackingDetailMapper = shipmentTrackingDetailMapper;
         this.parcelMapper = parcelMapper;
+        this.parcelItemMapper = parcelItemMapper;
+
+        this.parcelDao = parcelDao;
     }
 
     @PostConstruct
@@ -143,13 +155,28 @@ public class InitDbService {
                         postOfficeMapper.toEntity(postOfficeSaved), ShipmentStatus.PREPARED, new Date());
         shipmentTrackingDetailService.save(shipmentTrackingDetailMapper.toDto(shipmentTrackingDetail));
 
+        //create ParcelItem
+        ParcelItem parcelItem1 = new ParcelItem("test1", 1, 1.0f, BigDecimal.valueOf(10.0f));
+        ParcelItem parcelItem2 = new ParcelItem("test2", 2, 2.0f, BigDecimal.valueOf(20.0f));
+        ParcelItem parcelItem3 = new ParcelItem("test3", 3, 3.0f, BigDecimal.valueOf(30.0f));
+
+        List<ParcelItem> parcelItems = new ArrayList<>();
+        parcelItems.add(parcelItem1);
+        parcelItems.add(parcelItem2);
+        parcelItems.add(parcelItem3);
+
+        parcelItems.forEach(p -> parcelItemService.save(parcelItemMapper.toDto(p)));
+
         //create Parcel
         Parcel parcel1 = new Parcel(0.4f, 29.0f, 3.0f, 0.5f, BigDecimal.valueOf(20.0f),
                 BigDecimal.valueOf(15.0f));
         parcel1.setShipment(shipmentMapper.toEntity(shipmentsSaved.get(0)));
+        parcel1.setParcelItems(new HashSet<>(parcelItems));
+
         Parcel parcel2 = new Parcel(14.0f, 69.0f, 4.0f, 1.0f, BigDecimal.valueOf(100.0f),
                 BigDecimal.valueOf(30.0f));
         parcel2.setShipment(shipmentMapper.toEntity(shipmentsSaved.get(0)));
+
         parcelService.save(parcelMapper.toDto(parcel1));
         parcelService.save(parcelMapper.toDto(parcel2));
     }

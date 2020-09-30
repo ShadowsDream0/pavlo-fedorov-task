@@ -1,8 +1,11 @@
 package com.opinta.service;
 
+import com.opinta.dao.ParcelDao;
 import com.opinta.dao.ParcelItemDao;
 import com.opinta.dto.ParcelItemDto;
+import com.opinta.entity.Parcel;
 import com.opinta.entity.ParcelItem;
+import com.opinta.entity.Shipment;
 import com.opinta.mapper.ParcelItemMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 
+import java.util.List;
+
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
 @Service
@@ -18,11 +23,26 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 public class ParcelItemServiceImpl implements ParcelItemService {
     private final ParcelItemDao parcelItemDao;
     private final ParcelItemMapper parcelItemMapper;
+    private final ParcelDao parcelDao;
 
     @Autowired
-    public ParcelItemServiceImpl(ParcelItemDao parcelItemDao, ParcelItemMapper parcelItemMapper) {
+    public ParcelItemServiceImpl(ParcelItemDao parcelItemDao, ParcelItemMapper parcelItemMapper,
+                                 ParcelDao parcelDao) {
         this.parcelItemDao = parcelItemDao;
         this.parcelItemMapper = parcelItemMapper;
+        this.parcelDao = parcelDao;
+    }
+
+    @Override
+    @Transactional
+    public List<ParcelItemDto> getAllParcelItemsByParcelId(long parcelId) {
+        Parcel parcel = parcelDao.getById(parcelId);
+        if (parcel == null) {
+            log.debug("Can't get parcel item list by parcel. Parcel {} doesn't exist", parcelId);
+            return null;
+        }
+        log.info("Getting all parcel items by parcel {}", parcel);
+        return parcelItemMapper.toDto(parcelItemDao.getAllParcelItemsByParcel(parcel));
     }
 
     @Override

@@ -29,7 +29,7 @@ public class Parcel {
     private BigDecimal declaredPrice;
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = "parcels", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "parcels")
     private Set<ParcelItem> parcelItems = new HashSet<>();
 
 

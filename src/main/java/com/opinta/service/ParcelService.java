@@ -10,6 +10,10 @@ public interface ParcelService {
 
     List<ParcelDto> getAllParcelsByShipmentId(long shipmentId);
 
+    List<ParcelDto> getAll();
+
+    List<Parcel> getAllEntities();
+
     Parcel getEntityById(long id);
 
     Parcel saveEntity(Parcel parcel);

@@ -5,7 +5,12 @@ import com.opinta.dto.ParcelItemDto;
 import com.opinta.entity.Parcel;
 import com.opinta.entity.ParcelItem;
 
+import java.util.List;
+
 public interface ParcelItemService {
+
+    List<ParcelItemDto> getAllParcelItemsByParcelId(long parcelId);
+
     ParcelItem getEntityById(long id);
 
     ParcelItem saveEntity(ParcelItem parcelItem);

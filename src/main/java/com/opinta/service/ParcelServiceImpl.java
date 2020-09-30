@@ -53,6 +53,19 @@ public class ParcelServiceImpl implements ParcelService {
 
     @Override
     @Transactional
+    public List<ParcelDto> getAll() {
+        return parcelMapper.toDto(getAllEntities());
+    }
+
+    @Override
+    @Transactional
+    public List<Parcel> getAllEntities() {
+        log.info("Getting all parcels");
+        return parcelDao.getAll();
+    }
+
+    @Override
+    @Transactional
     public Parcel getEntityById(final long id) {
         log.info("Getting Parcel by id {}", id);
         return parcelDao.getById(id);
