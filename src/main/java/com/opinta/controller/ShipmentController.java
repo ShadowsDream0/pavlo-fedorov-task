@@ -2,8 +2,10 @@ package com.opinta.controller;
 
 import java.util.List;
 
+import com.opinta.dto.ParcelDto;
 import com.opinta.dto.ShipmentDto;
 import com.opinta.service.PDFGeneratorService;
+import com.opinta.service.ParcelService;
 import com.opinta.service.ShipmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,11 +31,14 @@ import static org.springframework.http.HttpStatus.OK;
 public class ShipmentController {
     private ShipmentService shipmentService;
     private PDFGeneratorService pdfGeneratorService;
+    private ParcelService parcelService;
 
     @Autowired
-    public ShipmentController(ShipmentService shipmentService, PDFGeneratorService pdfGeneratorService) {
+    public ShipmentController(ShipmentService shipmentService, PDFGeneratorService pdfGeneratorService,
+                              ParcelService parcelService) {
         this.shipmentService = shipmentService;
         this.pdfGeneratorService = pdfGeneratorService;
+        this.parcelService = parcelService;
     }
 
     @GetMapping
@@ -49,6 +54,15 @@ public class ShipmentController {
             return new ResponseEntity<>(format("No Shipment found for ID %d", id), NOT_FOUND);
         }
         return new ResponseEntity<>(shipmentDto, OK);
+    }
+
+    @GetMapping("{id}/parcels")
+    public ResponseEntity<?> getParcels(@PathVariable("id") long shipmentId) {
+        List<ParcelDto> parcelDtos = parcelService.getAllParcelsByShipmentId(shipmentId);
+        if (parcelDtos == null) {
+            return new ResponseEntity<>(format("Shipment %d doesn't exist", shipmentId), NOT_FOUND);
+        }
+        return new ResponseEntity<>(parcelDtos, OK);
     }
 
     @GetMapping("{id}/label-form")

@@ -2,7 +2,6 @@ package com.opinta.service;
 
 import com.opinta.dao.ParcelItemDao;
 import com.opinta.dto.ParcelItemDto;
-import com.opinta.entity.Parcel;
 import com.opinta.entity.ParcelItem;
 import com.opinta.mapper.ParcelItemMapper;
 import lombok.NonNull;
@@ -17,8 +16,8 @@ import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 @Service
 @Slf4j
 public class ParcelItemServiceImpl implements ParcelItemService {
-    private ParcelItemDao parcelItemDao;
-    private ParcelItemMapper parcelItemMapper;
+    private final ParcelItemDao parcelItemDao;
+    private final ParcelItemMapper parcelItemMapper;
 
     @Autowired
     public ParcelItemServiceImpl(ParcelItemDao parcelItemDao, ParcelItemMapper parcelItemMapper) {

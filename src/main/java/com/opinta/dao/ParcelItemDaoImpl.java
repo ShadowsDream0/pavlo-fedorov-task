@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ParcelItemDaoImpl implements ParcelItemDao {
-    SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
     @Autowired
     public ParcelItemDaoImpl(@NonNull final SessionFactory sessionFactory) {

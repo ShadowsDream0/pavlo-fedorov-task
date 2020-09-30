@@ -1,14 +1,20 @@
 package com.opinta.dao;
 
 import com.opinta.entity.Parcel;
+import com.opinta.entity.Shipment;
+
+import java.util.List;
 
 
 public interface ParcelDao {
+
+    List<Parcel> getAllParcelsByShipment(Shipment shipment);
+
     Parcel getById(long id);
 
-    Parcel save(Parcel shipment);
+    Parcel save(Parcel parcel);
 
-    void update(Parcel shipment);
+    void update(Parcel parcel);
 
-    void delete(Parcel shipment);
+    void delete(Parcel parcel);
 }

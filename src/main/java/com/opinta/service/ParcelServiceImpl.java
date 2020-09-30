@@ -1,6 +1,7 @@
 package com.opinta.service;
 
 import com.opinta.dao.ParcelDao;
+import com.opinta.dao.ShipmentDao;
 import com.opinta.dao.TariffGridDao;
 import com.opinta.dto.ParcelDto;
 import com.opinta.dto.ShipmentDto;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.apache.commons.beanutils.BeanUtils.copyProperties;
 
@@ -23,16 +25,30 @@ public class ParcelServiceImpl implements ParcelService {
     private final ParcelMapper parcelMapper;
     private final TariffGridDao tariffGridDao;
     private final ParcelDao parcelDao;
+    private final ShipmentDao shipmentDao;
     private final ShipmentService shipmentService;
 
 
     @Autowired
     ParcelServiceImpl(final ParcelMapper parcelMapper, final TariffGridDao tariffGridDao, final ParcelDao parcelDao,
-                      final ShipmentService shipmentService) {
+                      final ShipmentService shipmentService, final ShipmentDao shipmentDao) {
         this.parcelMapper = parcelMapper;
         this.tariffGridDao = tariffGridDao;
         this.parcelDao = parcelDao;
         this.shipmentService = shipmentService;
+        this.shipmentDao = shipmentDao;
+    }
+
+    @Override
+    @Transactional
+    public List<ParcelDto> getAllParcelsByShipmentId(long shipmentId) {
+        Shipment shipment = shipmentDao.getById(shipmentId);
+        if (shipment == null) {
+            log.debug("Can't get parcel list by shipment. Client {} doesn't exist", shipmentId);
+            return null;
+        }
+        log.info("Getting all parcels by shipment {}", shipment);
+        return parcelMapper.toDto(parcelDao.getAllParcelsByShipment(shipment));
     }
 
     @Override

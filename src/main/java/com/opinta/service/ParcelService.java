@@ -2,8 +2,13 @@ package com.opinta.service;
 
 import com.opinta.dto.ParcelDto;
 import com.opinta.entity.Parcel;
+import com.opinta.entity.Shipment;
+
+import java.util.List;
 
 public interface ParcelService {
+
+    List<ParcelDto> getAllParcelsByShipmentId(long shipmentId);
 
     Parcel getEntityById(long id);
 
