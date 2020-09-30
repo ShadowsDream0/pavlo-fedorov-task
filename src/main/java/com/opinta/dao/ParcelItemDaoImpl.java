@@ -1,6 +1,6 @@
 package com.opinta.dao;
 
-import com.opinta.entity.Parcel;
+import com.opinta.entity.ParcelItem;
 import lombok.NonNull;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -8,35 +8,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ParcelDaoImpl implements ParcelDao {
-    private final SessionFactory sessionFactory;
+public class ParcelItemDaoImpl implements ParcelItemDao {
+    SessionFactory sessionFactory;
 
     @Autowired
-    public ParcelDaoImpl(SessionFactory sessionFactory) {
+    public ParcelItemDaoImpl(@NonNull final SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
     @Override
-    public Parcel getById(long id) {
+    public ParcelItem getById(final long id) {
         final Session session = sessionFactory.getCurrentSession();
-        return (Parcel) session.get(Parcel.class, id);
+        return (ParcelItem) session.get(ParcelItem.class, id);
     }
 
     @Override
-    public Parcel save(@NonNull final Parcel parcel) {
+    public ParcelItem save(@NonNull final ParcelItem parcelItem) {
         final Session session = sessionFactory.getCurrentSession();
-        return (Parcel) session.merge(parcel);
+        return (ParcelItem) session.merge(parcelItem);
     }
 
     @Override
-    public void update(@NonNull final Parcel parcel) {
+    public void update(ParcelItem parcelItem) {
         final Session session = sessionFactory.getCurrentSession();
-        session.update(parcel);
+        session.update(parcelItem);
     }
 
     @Override
-    public void delete(@NonNull final Parcel parcel) {
+    public void delete(ParcelItem parcelItem) {
         final Session session = sessionFactory.getCurrentSession();
-        session.delete(parcel);
+        session.delete(parcelItem);
     }
 }

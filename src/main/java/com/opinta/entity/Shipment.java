@@ -57,9 +57,12 @@ public class Shipment {
         this.price = calculatePrice();
     }
 
-    public void addParcel(@NonNull final Parcel parcel) {
-        parcel.setShipment(this);
-        this.parcels.add(parcel);
+    public boolean addParcel(final Parcel parcel) {
+        if (parcel != null) {
+            parcel.setShipment(this);
+            return this.parcels.add(parcel);
+        }
+        return false;
     }
 
     public BigDecimal getPrice() {

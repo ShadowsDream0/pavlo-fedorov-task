@@ -58,10 +58,11 @@ public class ParcelServiceImpl implements ParcelService {
     @Override
     @Transactional
     public ParcelDto save(final ParcelDto parcelDto) {
-
         Parcel parcel = parcelMapper.toEntity(parcelDto);
 
         parcel.setPrice(calculateParcelPrice(parcelDto));
+
+        log.info("Saving parcel: {} ", parcel);
 
         return parcelMapper.toDto(parcelDao.save(parcel));
     }

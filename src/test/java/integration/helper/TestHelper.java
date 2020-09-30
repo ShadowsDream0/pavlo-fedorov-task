@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Component
 public class TestHelper {
@@ -53,9 +51,6 @@ public class TestHelper {
 
     public void deleteShipment(Shipment shipment) {
         shipmentService.delete(shipment.getId());
-        /*shipment.getParcels().stream()
-                                .filter(Objects::nonNull)
-                                .forEach(this::deleteParcel);*/
         clientService.delete(shipment.getSender().getId());
         clientService.delete(shipment.getRecipient().getId());
     }
@@ -106,18 +101,38 @@ public class TestHelper {
 
     private List<Parcel> createParcels(Shipment shipment) {
         List<Parcel> parcels = new ArrayList<>();
+
         Parcel parcel1 = new Parcel(0.4f, 29.0f, 3.0f, 0.5f, BigDecimal.valueOf(20.0f),
                 BigDecimal.valueOf(15.0f));
         parcel1.setShipment(shipment);
+        parcel1.setParcelItems(createParcelItems());
+
         Parcel parcel2 = new Parcel(14.0f, 69.0f, 4.0f, 1.0f, BigDecimal.valueOf(100.0f),
                 BigDecimal.valueOf(30.0f));
         parcel2.setShipment(shipment);
+        parcel2.setParcelItems(createParcelItems());
+
         parcels.add(parcel1);
         parcels.add(parcel2);
+
         return parcels;
     }
 
     private void deleteParcel(Parcel parcel) {
         parcelService.delete(parcel.getId());
+    }
+
+    private Set<ParcelItem> createParcelItems() {
+        ParcelItem parcelItem1 = new ParcelItem("test1", 1, 1.0f, BigDecimal.valueOf(10.0f));
+        ParcelItem parcelItem2 = new ParcelItem("test2", 2, 2.0f, BigDecimal.valueOf(20.0f));
+        ParcelItem parcelItem3 = new ParcelItem("test3", 3, 3.0f, BigDecimal.valueOf(30.0f));
+
+        Set<ParcelItem> parcelItems = new HashSet<>();
+
+        parcelItems.add(parcelItem1);
+        parcelItems.add(parcelItem2);
+        parcelItems.add(parcelItem3);
+
+        return parcelItems;
     }
 }

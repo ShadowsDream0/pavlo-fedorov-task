@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(exclude = "shipment")
+@Table(name = "parcel")
 public class Parcel {
     @Id
     @GeneratedValue
@@ -28,7 +29,7 @@ public class Parcel {
     private BigDecimal declaredPrice;
     private BigDecimal price;
 
-    @ManyToMany(mappedBy = "parcels", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "parcels", cascade = CascadeType.ALL)
     private Set<ParcelItem> parcelItems = new HashSet<>();
 
 
