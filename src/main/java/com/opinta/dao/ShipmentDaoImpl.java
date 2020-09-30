@@ -6,6 +6,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -14,10 +15,12 @@ import java.util.List;
 @Repository
 public class ShipmentDaoImpl implements ShipmentDao {
     private final SessionFactory sessionFactory;
+    private final ParcelDao parcelDao;
 
     @Autowired
-    public ShipmentDaoImpl(SessionFactory sessionFactory) {
+    public ShipmentDaoImpl(SessionFactory sessionFactory, ParcelDao parcelDao) {
         this.sessionFactory = sessionFactory;
+        this.parcelDao = parcelDao;
     }
 
     @Override
@@ -42,7 +45,8 @@ public class ShipmentDaoImpl implements ShipmentDao {
     @Override
     public Shipment getById(long id) {
         Session session = sessionFactory.getCurrentSession();
-        return (Shipment) session.get(Shipment.class, id);
+         Shipment shipment = (Shipment) session.get(Shipment.class, id);
+        return shipment;
     }
 
     @Override
